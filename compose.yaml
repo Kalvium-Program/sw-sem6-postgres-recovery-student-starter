@@ -8,7 +8,7 @@ services:
     secrets: [password]
     volumes: [source_data:/var/lib/postgresql/data, ./seed:/docker-entrypoint-initdb.d:ro]
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U practice -d records"]
+      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -U practice -d records"]
       interval: 2s
       timeout: 3s
       retries: 30
@@ -22,7 +22,7 @@ services:
     secrets: [password]
     volumes: [restore_data:/var/lib/postgresql/data]
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U practice -d recovered"]
+      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -U practice -d recovered"]
       interval: 2s
       timeout: 3s
       retries: 30

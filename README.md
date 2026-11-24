@@ -1,13 +1,30 @@
-# Student PostgreSQL recovery practice
+# Campus Events: backup and restore practice
 
-Bash, Docker Desktop/Engine, Compose v2 supporting --wait. No host PostgreSQL. Pinned PostgreSQL16; data path matches that version. Dummy-only data. No host database ports.
+A small PostgreSQL database for campus event registrations. You will back it up, lose a record by accident, and get it back.
 
-Fork this starter, clone your fork and enter it. Run bash practice.sh setup only in fresh working copy (refuses existing source). Then start, read, add. Save source identity before replace; replace only source container, save new identity, then read before any further write. Never remove volume.
+## Start
 
-Run backup; failure/partial file is not a valid backup. Ask mentor to inspect target: separate restore service, recovered database, distinct restore_data volume, no public tables. Only mentor-confirmed disposable target may receive restore command:
+```bash
+cp .env.example .env
+docker compose up -d --wait
+docker compose exec -T db psql -U app -d events -c "TABLE registrations;"
+```
 
-bash practice.sh restore MENTOR_CONFIRMED_DISPOSABLE
+You should see three registrations. The database files live in the `events_data` volume.
 
-Typing confirmation is not approval by itself; mentor must inspect. Then verify both recovered and original entries. down removes project containers/network, not volumes. No -v/prune, no --clean restore, no unknown target. Never restore untrusted archives: dumps can execute supplied SQL. Dummy account is privileged for bounded exercise, not production role design.
+## Files
 
-Expected owned record: event-registration-owned-record. Source and target use separate project-scoped volumes. Do not reuse project name across independent concurrent copies. If target has tables, STOP; preserve it and ask mentor for fresh separately named exercise target. Archive is local host data: protect it and copy to an authorised independent location for real recovery planning. No backup guarantee from one local file or one restore test.
+| File | What it is |
+| --- | --- |
+| `compose.yaml` | One PostgreSQL 16 service called `db` with a named volume |
+| `seed/01-registrations.sql` | Creates the table and three rows the first time the volume is empty |
+| `scripts/accident.sql` | A teammate's "cleanup" script that deletes a real registration |
+| `backups/` | Put your backup files here. Git ignores them. |
+
+## Stop
+
+```bash
+docker compose down
+```
+
+This keeps the volume and your data. Do not add `-v`.

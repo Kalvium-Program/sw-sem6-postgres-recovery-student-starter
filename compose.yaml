@@ -1,34 +1,18 @@
+name: pg-recovery-practice
 services:
-  source:
-    image: postgres:16-bookworm@sha256:5264710be20f409750ac6dc4e5706dcef929c87e241605463f0f9aefa932a8d9
+  db:
+    image: postgres:16-alpine
     environment:
-      POSTGRES_USER: practice
-      POSTGRES_DB: records
-      POSTGRES_PASSWORD_FILE: /run/secrets/password
-    secrets: [password]
-    volumes: [source_data:/var/lib/postgresql/data, ./seed:/docker-entrypoint-initdb.d:ro]
+      POSTGRES_USER: app
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?Copy .env.example to .env first}
+      POSTGRES_DB: events
+    volumes:
+      - events_data:/var/lib/postgresql/data
+      - ./seed:/docker-entrypoint-initdb.d:ro
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -U practice -d records"]
-      interval: 2s
-      timeout: 3s
-      retries: 30
-  restore:
-    image: postgres:16-bookworm@sha256:5264710be20f409750ac6dc4e5706dcef929c87e241605463f0f9aefa932a8d9
-    profiles: [recovery]
-    environment:
-      POSTGRES_USER: practice
-      POSTGRES_DB: recovered
-      POSTGRES_PASSWORD_FILE: /run/secrets/password
-    secrets: [password]
-    volumes: [restore_data:/var/lib/postgresql/data]
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -U practice -d recovered"]
+      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -U app -d events"]
       interval: 2s
       timeout: 3s
       retries: 30
 volumes:
-  source_data:
-  restore_data:
-secrets:
-  password:
-    file: ./secrets/password.txt
+  events_data:

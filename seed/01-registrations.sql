@@ -5,6 +5,6 @@ CREATE TABLE registrations (
   registered_on date NOT NULL DEFAULT CURRENT_DATE
 );
 INSERT INTO registrations (name, event) VALUES
-  ('Asha', 'Design Sprint'),
-  ('Ravi', 'Robotics Workshop'),
-  ('Meera', 'Photo Walk');
+  ('Alex', 'Design Sprint'),
+  ('Sam', 'Robotics Workshop'),
+  ('Taylor', 'Photo Walk');
